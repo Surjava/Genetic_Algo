@@ -12,19 +12,13 @@ public class TSP_GA {
         // n is the number of nodes i.e. V
 
         long startTime = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
-
-
-
-//        initialization(gene_size,population_size).forEach((gene)->{
-//            System.out.println(gene);
-//            System.out.println("Fitness : "+fitness_value(gene));
-//        });
-        List<List<Integer>> initial_populaion = initialization(gene_size,population_size);
-        List<List<Integer>> populaion = new ArrayList<>(initial_populaion);
+        List<List<Integer>> initial_population = initialization(gene_size,population_size);
+        List<List<Integer>> populaion = new ArrayList<>(initial_population);
         for(int i =1 ; i<= 1000 ; i++) {
             populaion = new ArrayList<>(selection(populaion));
             if(i%5 == 0)
             {
+                //Introducing a mutation every 5th generation
                 mutation(populaion);
             }
         }
@@ -35,8 +29,6 @@ public class TSP_GA {
 
         long endTime = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
         System.out.println("Time taken = "+(endTime-startTime) + " seconds");
-        System.gc();
-
 
     }
 
@@ -57,10 +49,11 @@ public class TSP_GA {
         return population;
     }
 
+    //To calculate the cost of the path taken
     public static int fitness_value(List<Integer> gene)
     {
         List<Integer> fit_gene = new ArrayList<>(gene);
-        fit_gene.add(0);
+        fit_gene.add(0);//adding 0 at end to calculate cost of returning to starting position
         int fitness = 0;
         int[][] graph = {
                 {0,5,7,7,8,3,3,1,2,4,4,9,3},
@@ -86,13 +79,14 @@ public class TSP_GA {
     }
     public static List<List<Integer>> selection ( List<List<Integer>> population)
     {
-        int min = Integer.MAX_VALUE;
+        int min = Integer.MAX_VALUE;//just for reference
         List<List<Integer>> selected_population = new ArrayList<>();
         List<List<Integer>> selected_population_from_discarded = new ArrayList<>();
         List<List<Integer>> selected_crossover_population = new ArrayList<>();
         List<List<Integer>> discarded_population = new ArrayList<>();
         List<List<Integer>> final_population = new ArrayList<>();
 
+        //comparing 2 consecutive Lists and selecting the one with lower cost path
         for(int i = 0; i < population.size()-1;i+=2)
         {
             int fitness1 = fitness_value(population.get(i));
@@ -114,6 +108,7 @@ public class TSP_GA {
 
 
 
+        //selecting best among the discarded.
         for(int i = 0; i < discarded_population.size()-1;i+=2)
         {
             if(fitness_value(discarded_population.get(i)) <= fitness_value(discarded_population.get(i + 1)))
@@ -127,6 +122,9 @@ public class TSP_GA {
         return final_population;
     }
 
+    //breaking the 2 consecutive lists into 3 parts
+    //adding the middle part of first list in new list (in same positions)
+    //adding the other elements of the second list into the new list in order (excluding elements taken from first list)
     private static List<List<Integer>> crossover(List<List<Integer>> selected_population) {
         final List<List<Integer>> crossover_population = new ArrayList<>();
         for(int i = 0 ;i<selected_population.size()/2;i++)
