@@ -23,6 +23,10 @@ public class TSP_GA {
         List<List<Integer>> populaion = new ArrayList<>(initial_populaion);
         for(int i =1 ; i<= 1000 ; i++) {
             populaion = new ArrayList<>(selection(populaion));
+            if(i%5 == 0)
+            {
+                mutation(populaion);
+            }
         }
         populaion.forEach((gene)->{
             System.out.println(gene);
@@ -30,7 +34,8 @@ public class TSP_GA {
         });
 
         long endTime = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
-        System.out.println("Time taken = "+(endTime-startTime));
+        System.out.println("Time taken = "+(endTime-startTime) + " seconds");
+        System.gc();
 
 
     }
@@ -58,19 +63,19 @@ public class TSP_GA {
         fit_gene.add(0);
         int fitness = 0;
         int[][] graph = {
-                {0,5,7,7,8,10,3,1,2,4,4,9,10},
-                {2,0,7,8,10,3,7,3,5,6,1,8,6},
-                {2,10,0,10,4,5,2,1,10,10,6,7,6},
+                {0,5,7,7,8,3,3,1,2,4,4,9,3},
+                {2,0,7,8,3,3,7,3,5,6,1,8,6},
+                {2,3,0,3,4,5,2,1,3,3,6,7,6},
                 {8,3,7,0,7,6,3,6,6,4,7,7,4},
-                {7,5,1,5,0,9,4,6,3,5,9,6,10},
-                {8,3,3,10,1,0,3,5,4,2,4,0,2},
-                {9,9,7,3,7,5,0,8,10,2,8,7,1},
-                {4,8,5,5,7,5,1,0,2,7,10,1,3},
+                {7,5,1,5,0,9,4,6,3,5,9,6,3},
+                {8,3,3,3,1,0,3,5,4,2,4,3,2},
+                {9,9,7,3,7,5,0,8,3,2,8,7,1},
+                {4,8,5,5,7,5,1,0,2,7,3,1,3},
                 {8,7,2,3,5,3,4,9,0,5,1,4,5},
                 {2,9,3,9,1,9,8,1,6,0,8,9,2},
-                {5,1,8,9,6,6,9,9,3,10,0,6,5},
-                {2,6,1,9,4,9,9,10,6,4,6,0,1},
-                {9,7,5,9,10,3,5,9,4,1,10,2,0}
+                {5,1,8,9,6,6,9,9,3,3,0,6,5},
+                {2,6,1,9,4,9,9,3,6,4,6,0,1},
+                {9,7,5,9,3,3,5,9,4,1,3,2,0}
         };
 
         for(int i = 0;i<fit_gene.size()-1;i++)
@@ -81,6 +86,7 @@ public class TSP_GA {
     }
     public static List<List<Integer>> selection ( List<List<Integer>> population)
     {
+        int min = Integer.MAX_VALUE;
         List<List<Integer>> selected_population = new ArrayList<>();
         List<List<Integer>> selected_population_from_discarded = new ArrayList<>();
         List<List<Integer>> selected_crossover_population = new ArrayList<>();
@@ -89,7 +95,10 @@ public class TSP_GA {
 
         for(int i = 0; i < population.size()-1;i+=2)
         {
-            if(fitness_value(population.get(i)) <= fitness_value(population.get(i + 1))) {
+            int fitness1 = fitness_value(population.get(i));
+            int fitness2 = fitness_value(population.get(i + 1));
+            min =Math.min(min, Math.min(fitness1,fitness2));
+            if(fitness1 <= fitness2) {
                 selected_population.add(population.get(i));
                 discarded_population.add(population.get(i + 1));
             }
@@ -114,6 +123,7 @@ public class TSP_GA {
         }
 
         final_population.addAll(selected_population_from_discarded);
+       // System.out.println("Min = "+ min);
         return final_population;
     }
 
@@ -148,5 +158,23 @@ public class TSP_GA {
 
         }
         return crossover_population;
+    }
+
+    //select random gene from population -> select two random position(other than 0th) and swap
+    private static void mutation(List<List<Integer>> population)
+    {
+        Random rd =  new Random();
+        List<Integer> gene_to_be_mutated = population.get(rd.nextInt(population_size));
+        int position1 = rd.nextInt(gene_size);
+        while (position1==0) {
+            position1 = rd.nextInt(gene_size); //to prevent 0th element to be switched
+        }
+        int position2 = rd.nextInt(gene_size);
+        while (position2==0){
+            position2 = rd.nextInt(gene_size);
+        }
+        int temp = gene_to_be_mutated.get(position1);
+        gene_to_be_mutated.set(position1,gene_to_be_mutated.get(position2));
+        gene_to_be_mutated.set(position2,temp);
     }
 }

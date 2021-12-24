@@ -9,14 +9,16 @@ public class Test {
             Collections.shuffle(array);
             array.add(0, 0);
             System.out.println(array);
-        Integer[] arr2 = {9,8,7,6,5,4,3,2,1};
-        List<Integer> array2 = new ArrayList<>(Arrays.asList(arr2));
-        Collections.shuffle(array2);
-        array2.add(0, 0);
-        System.out.println(array2);
+//        Integer[] arr2 = {9,8,7,6,5,4,3,2,1};
+//        List<Integer> array2 = new ArrayList<>(Arrays.asList(arr2));
+//        Collections.shuffle(array2);
+       // array2.add(0, 0);
+       // System.out.println(array2);
 
-        System.out.println(crossover(array,array2));
-
+       // System.out.println(crossover(array,array2));
+        //System.out.println(array);
+mutation(array);
+        System.out.println(array);
     }
 
 
@@ -46,6 +48,23 @@ public class Test {
             }
 
         return crossover_gene;
+    }
+
+
+    private static void mutation(List<Integer> gene)
+    {
+        Random rd =  new Random();
+        int position1 = rd.nextInt(gene_size);
+       while (position1==0) {
+           position1 = rd.nextInt(gene_size);
+       }
+        int position2 = rd.nextInt(gene_size);
+       while (position2==0){
+           position2 = rd.nextInt(gene_size);
+       }
+        int temp = gene.get(position1);
+        gene.set(position1, gene.get(position2));
+        gene.set(position2,temp);
     }
 
 }
